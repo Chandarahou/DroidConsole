@@ -4,20 +4,18 @@ import * as api from '../services/api';
 export function RotateButton({ serial }) {
   const [loading, setLoading] = useState(false);
 
+  const [isLandscape, setIsLandscape] = useState(false);
+
   const handleRotate = useCallback(async () => {
     setLoading(true);
     try {
-      // Toggle rotation: check current, then flip
-      // user_rotation: 0=portrait, 1=landscape, 2=reverse portrait, 3=reverse landscape
-      await api.batchShell([serial],
-        'settings put system accelerometer_rotation 0 && ' +
-        'current=$(settings get system user_rotation) && ' +
-        'if [ "$current" = "1" ]; then settings put system user_rotation 0; ' +
-        'else settings put system user_rotation 1; fi'
-      );
+      const nextRotation = isLandscape ? 0 : 1;
+      // Lock rotation to portrait(0) or landscape(1) via window manager
+      await api.batchShell([serial], `cmd window user-rotation lock ${nextRotation}`);
+      setIsLandscape(!isLandscape);
     } catch { /* ignore */ }
     finally { setLoading(false); }
-  }, [serial]);
+  }, [serial, isLandscape]);
 
   return (
     <button
