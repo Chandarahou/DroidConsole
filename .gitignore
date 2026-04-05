@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+release/
+*.blockmap
+
+# Environment & secrets
+.env
+.env.*
+
+# Data files (runtime generated)
+desktop-host/data/
+
+# Logs
+*.log
+electron-debug.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & tools
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+
+# Temp & test files
+test-*.png
+test-*.js
+
+# Package locks (keep root, ignore nested)
+desktop-host/package-lock.json
+web-frontend/package-lock.json

@@ -1,0 +1,64 @@
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: #1e1e2e;
+  border: 1px solid #313244;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 480px;
+  width: 90%;
+}
+
+.dialog h3 {
+  color: #cdd6f4;
+  margin: 0 0 8px;
+}
+
+.dialog-hint {
+  color: #6c7086;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.dialog-hint code {
+  background: #313244;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #a6e3a1;
+  font-size: 12px;
+}
+
+.dialog-form {
+  display: flex;
+  gap: 8px;
+}
+
+.dialog-form input {
+  flex: 1;
+  background: #313244;
+  border: 1px solid #45475a;
+  border-radius: 8px;
+  color: #cdd6f4;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.status-success {
+  color: #a6e3a1;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.status-error {
+  color: #f38ba8;
+  font-size: 13px;
+  margin-top: 8px;
+}

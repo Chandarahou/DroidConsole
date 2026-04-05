@@ -1,0 +1,19 @@
+{
+  "name": "droid-console-host",
+  "version": "1.0.0",
+  "description": "DroidConsole Desktop Host",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch-path=src src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "node-fetch": "^3.3.2",
+    "uuid": "^13.0.0",
+    "ws": "^8.20.0"
+  }
+}

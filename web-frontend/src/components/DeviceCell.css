@@ -1,0 +1,102 @@
+/* Top bar: dot + name + power */
+.dashboard-device-topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 420px;
+  padding: 0 4px;
+}
+
+.dashboard-device-name {
+  color: #cdd6f4;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1px dashed transparent;
+  transition: border-color 0.15s;
+}
+
+.dashboard-device-name:hover {
+  border-bottom-color: #585b70;
+}
+
+.dashboard-rename-input {
+  flex: 1;
+  background: #313244;
+  border: 1px solid #89b4fa;
+  border-radius: 4px;
+  color: #cdd6f4;
+  padding: 2px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+}
+
+.dashboard-master-badge {
+  background: #f9e2af;
+  color: #1e1e2e;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* Rotate button */
+.rotate-btn {
+  background: none;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  color: #a6adc8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.rotate-btn:hover:not(:disabled) {
+  color: #89b4fa;
+  border-color: #89b4fa;
+  background: rgba(137, 180, 250, 0.1);
+}
+
+.rotate-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* Power button (shared component) */
+.power-btn {
+  background: none;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  color: #a6adc8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.power-btn:hover:not(:disabled) {
+  color: #f38ba8;
+  border-color: #f38ba8;
+  background: rgba(243, 139, 168, 0.1);
+}
+
+.power-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}

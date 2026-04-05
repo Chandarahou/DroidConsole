@@ -1,0 +1,215 @@
+/* Laixi-style Groups panel inside sidebar */
+
+.gp-sidebar {
+  border-top: 1px solid #313244;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.gp-header {
+  color: #cdd6f4;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Rows (All devices, Ungrouped, named groups) */
+
+.gp-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.1s;
+  min-height: 26px;
+}
+
+.gp-row:hover {
+  background: rgba(137, 180, 250, 0.06);
+}
+
+.gp-row.active {
+  background: rgba(137, 180, 250, 0.12);
+}
+
+.gp-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #585b70;
+  flex-shrink: 0;
+}
+
+.gp-dot.online {
+  background: #a6e3a1;
+}
+
+.gp-label {
+  color: #a6adc8;
+  font-size: 12px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gp-row.active .gp-label {
+  color: #89b4fa;
+}
+
+.gp-selected {
+  color: #585b70;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.gp-delete {
+  background: none;
+  border: none;
+  color: #585b70;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.gp-row:hover .gp-delete {
+  opacity: 1;
+}
+
+.gp-delete:hover {
+  color: #f38ba8;
+}
+
+/* Device number grid */
+
+.gp-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.gp-chip {
+  min-width: 32px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  padding: 0 4px;
+  transition: all 0.1s;
+}
+
+.gp-chip.active {
+  background: #313244;
+  color: #cdd6f4;
+  border: 1px solid #45475a;
+}
+
+.gp-chip.active:hover {
+  background: #45475a;
+}
+
+.gp-chip.dimmed {
+  background: #1e1e2e;
+  color: #45475a;
+  border: 1px solid #313244;
+}
+
+.gp-chip.clickable {
+  cursor: pointer;
+}
+
+.gp-chip.clickable.dimmed:hover {
+  border-color: #a6e3a1;
+  color: #a6e3a1;
+  background: rgba(166, 227, 161, 0.1);
+}
+
+.gp-chip.clickable.active:hover {
+  border-color: #f38ba8;
+  color: #f38ba8;
+  background: rgba(243, 139, 168, 0.1);
+}
+
+.gp-hint {
+  color: #585b70;
+  font-size: 10px;
+  text-align: center;
+}
+
+/* Group list */
+
+.gp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Create group */
+
+.gp-create {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-top: 1px solid #313244;
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.gp-create-input {
+  flex: 1;
+  background: #313244;
+  border: 1px solid #45475a;
+  border-radius: 4px;
+  color: #cdd6f4;
+  padding: 4px 8px;
+  font-size: 11px;
+  min-width: 0;
+}
+
+.gp-create-input::placeholder {
+  color: #585b70;
+}
+
+.gp-char-count {
+  color: #45475a;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.gp-add-btn {
+  background: #89b4fa;
+  color: #1e1e2e;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.gp-add-btn:hover:not(:disabled) {
+  background: #74a8f8;
+}
+
+.gp-add-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

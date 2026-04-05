@@ -1,0 +1,36 @@
+.video-player {
+  background: #11111b;
+  border: 1px solid #313244;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #181825;
+  border-bottom: 1px solid #313244;
+}
+
+.video-serial {
+  color: #a6adc8;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.video-canvas {
+  /* Fixed size — no CSS scaling. Canvas pixels = display pixels for accurate clicks. */
+  display: block;
+  cursor: crosshair;
+  outline: none;
+  background: #000;
+}
+
+.video-canvas:focus {
+  outline: 2px solid #89b4fa;
+  outline-offset: -2px;
+}
