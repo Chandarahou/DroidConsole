@@ -7,6 +7,7 @@ import { sessionManager } from '../scrcpy/session-manager.js';
 import { batchController } from './batch-controller.js';
 import { adbClient } from '../adb/adb-client.js';
 import { shareManager } from './share-manager.js';
+import { warmupManager } from './warmup-manager.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('HTTP');
@@ -158,6 +159,116 @@ export function createHttpServer() {
     });
   });
 
+  // --- WhatsApp Register (UHID typing) ---
+
+  // WhatsApp registration page focusable element order (via Tab):
+  // 1. menuitem_overflow    2. scroll_view    3. description
+  // 4. registration_country 5. registration_cc 6. registration_phone
+  // 7. registration_submit (Next)
+
+  async function waTypeOnDevice(session, phoneNumber, countryCode) {
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    const tap = (keyCode) => { session.injectKeyEvent(0, keyCode, 0, 0); session.injectKeyEvent(1, keyCode, 0, 0); };
+    const tabN = async (n) => { for (let i = 0; i < n; i++) { tap(61); await sleep(150); } };
+
+    // Precondition: device must be on the clean WhatsApp registration page
+    // (no dialogs, no popups — user should dismiss them before using this feature)
+
+    // Flow (user-specified):
+    // Input CC → 1 Tab → Input phone number → 1 Tab → Enter (Next)
+    // → sleep 5s → 2 Tab → Enter (confirm "Yes")
+
+    if (countryCode) {
+      // Tab 5 to CC field (tab order: overflow, scroll, desc, country, cc)
+      await tabN(5);
+      await sleep(400);
+
+      // Clear existing code: move cursor right, then backspace
+      for (let i = 0; i < 5; i++) tap(22);
+      await sleep(100);
+      for (let i = 0; i < 5; i++) { tap(67); await sleep(100); }
+      await sleep(300);
+
+      // Type country code
+      session.injectText(countryCode.replace(/\D/g, ''));
+      await sleep(800);
+
+      // 1 Tab to phone field
+      await tabN(1);
+      await sleep(400);
+    } else {
+      // No CC change — 6 tabs to phone field
+      await tabN(6);
+      await sleep(400);
+    }
+
+    // Type phone number
+    const digits = phoneNumber.replace(/\D/g, '');
+    session.injectText(digits);
+    await sleep(800);
+
+    // 1 Tab to Next button
+    await tabN(1);
+    await sleep(300);
+
+    // Press Enter on Next
+    tap(23);
+
+    // Sleep 5 seconds — wait for confirm dialog ("Is this the correct number?")
+    await sleep(5000);
+
+    // 2 Tab to "Yes" button
+    await tabN(2);
+    await sleep(300);
+
+    // Press Enter on "Yes"
+    tap(23);
+
+    return digits.length;
+  }
+
+  app.post('/api/wa-register/type', async (req, res) => {
+    const { serial, phoneNumber, countryCode } = req.body;
+    if (!serial || !phoneNumber) return res.status(400).json({ error: 'serial and phoneNumber required' });
+
+    const session = sessionManager.getSession(serial);
+    if (!session || !session.running) {
+      return res.status(400).json({ error: 'No active mirror session for this device' });
+    }
+
+    try {
+      const count = await waTypeOnDevice(session, phoneNumber, countryCode);
+      res.json({ success: true, serial, digits: count });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/wa-register/batch', async (req, res) => {
+    const { entries } = req.body; // [{ serial, phoneNumber, countryCode }]
+    if (!entries || entries.length === 0) return res.status(400).json({ error: 'entries required' });
+
+    const results = await Promise.allSettled(
+      entries.map(async (entry) => {
+        const { serial, phoneNumber, countryCode } = entry;
+        const session = sessionManager.getSession(serial);
+        if (!session || !session.running) {
+          return { serial, success: false, error: 'No active mirror session' };
+        }
+        try {
+          const count = await waTypeOnDevice(session, phoneNumber, countryCode);
+          return { serial, success: true, digits: count };
+        } catch (err) {
+          return { serial, success: false, error: err.message };
+        }
+      })
+    );
+
+    res.json({
+      results: results.map(r => r.status === 'fulfilled' ? r.value : { serial: 'unknown', success: false, error: r.reason?.message })
+    });
+  });
+
   // --- Share endpoints ---
 
   app.post('/api/share/create', (req, res) => {
@@ -213,6 +324,57 @@ export function createHttpServer() {
     });
 
     res.json({ share: { name: share.name, serials: share.serials, devices, permissions: share.permissions, expiresAt: share.expiresAt } });
+  });
+
+  // --- WhatsApp Warm-Up ---
+
+  app.get('/api/warmup/status', (req, res) => {
+    res.json({ devices: warmupManager.getAllStates() });
+  });
+
+  app.get('/api/warmup/:serial', (req, res) => {
+    const state = warmupManager.getState(req.params.serial);
+    if (!state) return res.json({ state: null });
+    res.json({ state, autoRunning: warmupManager.isAutoRunning(req.params.serial) });
+  });
+
+  app.post('/api/warmup/start', (req, res) => {
+    const { serial, contacts, options } = req.body;
+    if (!serial) return res.status(400).json({ error: 'serial required' });
+    if (!contacts || contacts.length === 0) return res.status(400).json({ error: 'contacts required' });
+    const state = warmupManager.startWarmup(serial, contacts, options);
+    res.json({ state });
+  });
+
+  app.post('/api/warmup/stop', (req, res) => {
+    warmupManager.stopWarmup(req.body.serial);
+    res.json({ success: true });
+  });
+
+  app.post('/api/warmup/pause', (req, res) => {
+    const state = warmupManager.togglePause(req.body.serial);
+    res.json({ state });
+  });
+
+  app.post('/api/warmup/contacts', (req, res) => {
+    const { serial, contacts } = req.body;
+    const state = warmupManager.updateContacts(serial, contacts);
+    res.json({ state });
+  });
+
+  app.post('/api/warmup/execute', async (req, res) => {
+    const result = await warmupManager.executeAction(req.body.serial, { force: req.body.force, message: req.body.message });
+    res.json(result);
+  });
+
+  app.post('/api/warmup/auto-start', (req, res) => {
+    const ok = warmupManager.startAutoRun(req.body.serial);
+    res.json({ success: ok });
+  });
+
+  app.post('/api/warmup/auto-stop', (req, res) => {
+    warmupManager.stopAutoRun(req.body.serial);
+    res.json({ success: true });
   });
 
   // --- Network Info (for remote sharing) ---

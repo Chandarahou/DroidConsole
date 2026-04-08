@@ -1,0 +1,499 @@
+.wu-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 750px;
+}
+
+.wu-panel h3 {
+  color: var(--text);
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.wu-info-box {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* Phase guide */
+
+.wu-phases {
+  margin-bottom: 16px;
+}
+
+.wu-phases-title, .wu-start-title, .wu-active-title {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.wu-phase-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wu-phase-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  padding: 4px 8px;
+  background: var(--bg-overlay);
+  border-radius: 4px;
+}
+
+.wu-phase-num {
+  background: var(--accent);
+  color: var(--bg-surface);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.wu-phase-name {
+  color: var(--text);
+  font-weight: 600;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.wu-phase-desc {
+  color: var(--text-dim);
+}
+
+/* Start section */
+
+.wu-start-section {
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.wu-form-row {
+  margin-bottom: 10px;
+}
+
+.wu-form-row label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.wu-select {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.wu-select-actions {
+  margin-left: 10px;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.wu-link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.wu-link-btn:hover {
+  color: var(--accent-hover);
+}
+
+.wu-device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 180px;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.wu-device-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.1s;
+}
+
+.wu-device-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.wu-device-item.selected {
+  background: var(--accent-bg);
+}
+
+.wu-device-item input[type="checkbox"] {
+  accent-color: var(--accent);
+  margin: 0;
+}
+
+.wu-device-name {
+  color: var(--text);
+  flex: 1;
+}
+
+.wu-device-serial {
+  color: var(--text-faint);
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.wu-checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.wu-checkbox-label input {
+  accent-color: var(--accent);
+}
+
+.wu-hint {
+  color: var(--text-faint);
+  font-size: 10px;
+  margin-top: 4px;
+  margin-left: 22px;
+}
+
+.wu-contacts-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: monospace;
+  resize: vertical;
+}
+
+.wu-contacts-input::placeholder {
+  color: var(--text-faint);
+}
+
+.wu-delay-row .wu-delay-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.wu-delay-input {
+  width: 70px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  color: var(--text);
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.wu-start-btn {
+  width: 100%;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Active cards */
+
+.wu-active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wu-card {
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.wu-card.paused {
+  opacity: 0.6;
+}
+
+.wu-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.wu-card-name {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.wu-card-phase {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.wu-card-phase.phase-1 { background: var(--bg-card); color: var(--text-dim); }
+.wu-card-phase.phase-2 { background: var(--accent-bg); color: var(--accent); }
+.wu-card-phase.phase-3 { background: var(--yellow-bg); color: var(--yellow); }
+.wu-card-phase.phase-4 { background: var(--green-bg); color: var(--green); }
+.wu-card-phase.phase-5 { background: var(--green-bg); color: var(--green); }
+
+.wu-card-day {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.wu-card-paused {
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Stats */
+
+.wu-card-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.wu-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wu-stat-label {
+  color: var(--text-faint);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.wu-stat-value {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Progress bar */
+
+.wu-progress {
+  height: 4px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.wu-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+/* Recent actions */
+
+.wu-recent {
+  margin-bottom: 10px;
+}
+
+.wu-recent-title {
+  color: var(--text-faint);
+  font-size: 10px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.wu-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 3px 0;
+  color: var(--text-dim);
+}
+
+.wu-recent-item.failed {
+  color: var(--red);
+}
+
+.wu-recent-contact {
+  font-family: monospace;
+  color: var(--text-muted);
+  min-width: 100px;
+}
+
+.wu-recent-msg {
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Activity log */
+
+.wu-log {
+  margin-bottom: 10px;
+}
+
+.wu-log-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+.wu-log-toggle:hover {
+  color: var(--accent);
+}
+
+.wu-recent-inline {
+  margin-top: 4px;
+}
+
+.wu-log-full {
+  margin-top: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.wu-log-item {
+  display: grid;
+  grid-template-columns: 20px 140px 120px 1fr;
+  gap: 8px;
+  padding: 4px 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+
+.wu-log-item:last-child {
+  border-bottom: none;
+}
+
+.wu-log-item.failed {
+  color: var(--red);
+  background: var(--red-bg);
+}
+
+.wu-log-icon {
+  text-align: center;
+}
+
+.wu-log-time {
+  color: var(--text-faint);
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.wu-log-contact {
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.wu-log-msg {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wu-log-error {
+  color: var(--red);
+  font-size: 10px;
+  grid-column: 4;
+}
+
+/* Controls */
+
+.wu-custom-msg-row {
+  margin: 8px 0;
+}
+
+.wu-custom-msg-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+}
+
+.wu-custom-msg-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.wu-custom-msg-input::placeholder {
+  color: var(--text-muted);
+}
+
+.wu-card-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.wu-empty {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-faint);
+  font-size: 13px;
+}

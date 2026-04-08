@@ -86,6 +86,11 @@ export class SessionManager extends EventEmitter {
     const client = this.sessions.get(serial);
     if (client) client.injectScroll(x, y, scrollX, scrollY, width, height);
   }
+
+  setClipboard(serial, text, paste = true) {
+    const client = this.sessions.get(serial);
+    if (client) client.setClipboard(text, paste);
+  }
 }
 
 export const sessionManager = new SessionManager();

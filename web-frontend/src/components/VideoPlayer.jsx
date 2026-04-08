@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { VideoSocket } from '../services/websocket';
 import { controlSocket } from '../services/websocket';
 import './VideoPlayer.css';
@@ -246,6 +246,28 @@ export function VideoPlayer({ serial, deviceName, token, onClose, canvasWidth = 
       return;
     }
 
+    // Ctrl+V → push PC clipboard to phone clipboard, then paste
+    if (e.code === 'KeyV' && (e.ctrlKey || e.metaKey)) {
+      navigator.clipboard.readText().then(text => {
+        if (text) {
+          // Push to phone clipboard with paste=true (auto-pastes into focused field)
+          controlSocket.sendClipboard(serial, text, true);
+        }
+      }).catch(err => {
+        console.warn('Failed to read PC clipboard:', err);
+      });
+      return;
+    }
+
+    // Letter keys with modifiers (Ctrl+C, Ctrl+A, Ctrl+X, Ctrl+Z) → send keycode
+    // Android letters: KEYCODE_A=29 .. KEYCODE_Z=54
+    const letterCode = mapLetterKeyCode(e.code);
+    if (letterCode !== null && (e.ctrlKey || e.altKey || e.metaKey)) {
+      controlSocket.sendKey(serial, 0, letterCode, 0, getMetaState(e));
+      controlSocket.sendKey(serial, 1, letterCode, 0, getMetaState(e));
+      return;
+    }
+
     // Printable characters → text injection
     if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
       controlSocket.sendText(serial, e.key);
@@ -319,10 +341,21 @@ function mapDigitKeyCode(code) {
   return MAP[code] ?? null;
 }
 
+/** Map letter keys to Android keycodes (KEYCODE_A=29 .. KEYCODE_Z=54) */
+function mapLetterKeyCode(code) {
+  const m = code.match(/^Key([A-Z])$/);
+  if (!m) return null;
+  return 29 + (m[1].charCodeAt(0) - 'A'.charCodeAt(0));
+}
+
 function getMetaState(e) {
+  // Android meta state flags (from KeyEvent.java):
+  //   META_SHIFT_ON=0x1, META_SHIFT_LEFT_ON=0x40
+  //   META_ALT_ON=0x2,   META_ALT_LEFT_ON=0x10
+  //   META_CTRL_ON=0x1000, META_CTRL_LEFT_ON=0x2000
   let state = 0;
-  if (e.shiftKey) state |= 1;
-  if (e.ctrlKey) state |= 0x1000;
-  if (e.altKey) state |= 0x02;
+  if (e.shiftKey) state |= 0x1 | 0x40;
+  if (e.ctrlKey) state |= 0x1000 | 0x2000;
+  if (e.altKey) state |= 0x2 | 0x10;
   return state;
 }

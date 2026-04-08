@@ -10,13 +10,24 @@ A desktop application for managing, mirroring, and controlling multiple Android 
 - **Full Device Control** - Touch, keyboard, scroll, and DPAD navigation from your PC
 - **UHID Keyboard** - Virtual USB keyboard that bypasses app input restrictions (works on WhatsApp registration, etc.)
 - **Auto-Mirror** - All connected devices start mirroring automatically on app launch
+- **Splash Screen** - Animated bouncing logo splash screen on launch
+- **Custom Branding** - Custom Yihao app icon embedded into the .exe
 - **Main Screen View** - Double-click any device to enlarge it as the main screen with a control panel (Laixi-style)
-- **Device Groups** - Organize devices into groups with sidebar management, filter the grid by group
-- **Master/Slave Input** - Set a master device and broadcast touch/keyboard input to all other devices
+- **Device Groups** - Laixi-style sidebar Groups panel: create/edit/delete groups, device chips, filter the grid by group
+- **Right-Click Context Menu** - Set device name, move device between groups
+- **Screen Rotation Button** - Toggle portrait/landscape per device using `cmd window user-rotation lock` (no permissions needed)
+- **Night/Light Theme Toggle** - Sun/moon button switches between Catppuccin dark and light themes (CSS variables)
+- **WA Register** - Automate WhatsApp registration: enters country code + phone number using UHID keyboard (bypasses WhatsApp input blocks), then Tab navigation to confirm
+- **WA Warm-Up** - Automate WhatsApp account warm-up across multiple devices:
+  - 5 phases (Setup → Light → Moderate → Scaling → Operational) with daily message limits
+  - Multi-device selection with checkbox list and contact distribution
+  - WhatsApp vs WhatsApp Business toggle (correct app picked via `-p com.whatsapp` intent flag)
+  - Activity log with expandable history
+  - **Force Send** button bypasses daily phase limits
+- **PC ⇄ Phone Clipboard Sync** - Ctrl+V on the mirrored screen reads the PC clipboard and pushes it to the phone via scrcpy `SET_CLIPBOARD` (auto-pastes into focused field). Ctrl+C/X/A/Z send proper Android keycodes with meta state
+- **Master/Slave Input** - Set a master device and broadcast touch/keyboard/clipboard input to all other devices
 - **Remote Sharing** - Share device screens with other PCs on LAN or internet via share codes
 - **Batch Operations** - Install APKs, reboot, clear data, take screenshots, run shell commands across multiple devices
-- **Device Naming** - Right-click to rename devices or move them between groups
-- **Screen Rotation** - Toggle portrait/landscape per device
 - **TCP/WiFi Connect** - Connect devices wirelessly via ADB TCP
 
 ## Quick Start
@@ -65,6 +76,28 @@ npm run build
 | Backspace | Delete character |
 | 0-9 | Type digits |
 | Letters | Text input |
+| Ctrl+V | Push PC clipboard to phone and auto-paste |
+| Ctrl+C / Ctrl+X / Ctrl+A / Ctrl+Z | Send copy/cut/select-all/undo as Android keycodes |
+| F5 | Recent apps (Menu) |
+
+### WA Register
+
+1. Open the WhatsApp registration page on the device
+2. Go to the **WA Register** tab, enter country code and phone number
+3. Click Send — DroidConsole types via UHID keyboard and Tab-navigates to confirm
+
+### WA Warm-Up
+
+1. Go to the **WA Warm-Up** tab
+2. Select one or more devices, paste contacts (and toggle "Distribute contacts" for multi-device)
+3. Toggle **Use WhatsApp Business** if needed
+4. Start — actions follow phase-based daily limits
+5. Use **Force Send** to bypass the daily phase limit when needed
+6. Expand **Activity Log** to view history
+
+### Theme
+
+Click the sun/moon button in the header to toggle Night/Light theme.
 
 ### Remote Sharing
 

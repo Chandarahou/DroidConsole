@@ -168,6 +168,17 @@ export class WsServer {
         }
         break;
       }
+      case 'input:clipboard': {
+        const { serial, text, paste } = msg.data;
+        sessionManager.setClipboard(serial, text, paste !== false);
+        // If master, broadcast clipboard to slaves
+        if (serial === deviceManager.masterSerial) {
+          for (const slave of deviceManager.getSlaveDevices()) {
+            sessionManager.setClipboard(slave.serial, text, paste !== false);
+          }
+        }
+        break;
+      }
       default:
         log.warn('Unknown control message type', { type: msg.type });
     }

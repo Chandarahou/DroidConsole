@@ -1,6 +1,6 @@
 .video-player {
-  background: #11111b;
-  border: 1px solid #313244;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -12,12 +12,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background: #181825;
-  border-bottom: 1px solid #313244;
+  background: var(--bg-overlay);
+  border-bottom: 1px solid var(--border);
 }
 
 .video-serial {
-  color: #a6adc8;
+  color: var(--text-muted);
   font-size: 12px;
   font-family: monospace;
 }

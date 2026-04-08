@@ -8,6 +8,8 @@ import { GroupPanel } from './components/GroupPanel';
 import { SharePanel } from './components/SharePanel';
 import { ConnectDialog } from './components/ConnectDialog';
 import { ReceivedPanel } from './components/ReceivedPanel';
+import { WaRegisterPanel } from './components/WaRegisterPanel';
+import { WaWarmupPanel } from './components/WaWarmupPanel';
 import { ContextMenu } from './components/ContextMenu';
 import { ShareView } from './pages/ShareView';
 import { controlSocket } from './services/websocket';
@@ -33,9 +35,18 @@ function App() {
   const [activeGroup, setActiveGroup] = useState(null);
   const [ctxMenu, setCtxMenu] = useState(null); // { x, y, device }
   const [focusedSerial, setFocusedSerial] = useState(null); // double-click main screen
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('theme') || 'dark'
+  );
   const [displayScale, setDisplayScale] = useState(
     () => parseInt(localStorage.getItem('displayScale') || '50', 10)
   );
+
+  // Apply theme class to root
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   // --- Auto-start mirror for all connected devices ---
   const autoMirroredRef = useRef(new Set());
@@ -117,6 +128,8 @@ function App() {
 
   const navItems = [
     { id: 'devices', label: 'Devices', icon: '\u{1F4F1}' },
+    { id: 'wa-register', label: 'WA Register', icon: '\u{1F4DD}' },
+    { id: 'wa-warmup', label: 'WA Warm-Up', icon: '\u{1F525}' },
     { id: 'share', label: 'Remote Share', icon: '\u{1F517}' },
     { id: 'received', label: 'Received', icon: '\u{1F4E5}' },
     { id: 'display', label: 'Display Settings', icon: '\u{1F4BB}' },
@@ -137,6 +150,13 @@ function App() {
           <span className={`connection-dot ${connected ? 'online' : 'offline'}`} />
           <span className="status-text">{connected ? 'Connected' : 'Offline'}</span>
           <span className="device-count">{devices.length}</span>
+          <button
+            className="theme-toggle"
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {theme === 'dark' ? '\u2600' : '\u{1F319}'}
+          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -287,6 +307,14 @@ function App() {
                 selectedSerials={selectedSerials}
                 onSelectionChange={setSelectedSerials}
               />
+            )}
+
+            {activeTab === 'wa-register' && (
+              <WaRegisterPanel devices={devices} sessions={sessions} />
+            )}
+
+            {activeTab === 'wa-warmup' && (
+              <WaWarmupPanel devices={devices} sessions={sessions} />
             )}
 
             {activeTab === 'share' && (

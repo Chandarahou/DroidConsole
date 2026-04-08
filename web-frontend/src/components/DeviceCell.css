@@ -9,7 +9,7 @@
 }
 
 .dashboard-device-name {
-  color: #cdd6f4;
+  color: var(--text);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -22,15 +22,15 @@
 }
 
 .dashboard-device-name:hover {
-  border-bottom-color: #585b70;
+  border-bottom-color: var(--text-faint);
 }
 
 .dashboard-rename-input {
   flex: 1;
-  background: #313244;
-  border: 1px solid #89b4fa;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
   border-radius: 4px;
-  color: #cdd6f4;
+  color: var(--text);
   padding: 2px 8px;
   font-size: 13px;
   font-weight: 600;
@@ -38,7 +38,7 @@
 }
 
 .dashboard-master-badge {
-  background: #f9e2af;
+  background: var(--yellow);
   color: #1e1e2e;
   font-size: 9px;
   font-weight: 700;
@@ -51,9 +51,9 @@
 /* Rotate button */
 .rotate-btn {
   background: none;
-  border: 1px solid #45475a;
+  border: 1px solid var(--border-light);
   border-radius: 6px;
-  color: #a6adc8;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -64,8 +64,8 @@
 }
 
 .rotate-btn:hover:not(:disabled) {
-  color: #89b4fa;
-  border-color: #89b4fa;
+  color: var(--accent);
+  border-color: var(--accent);
   background: rgba(137, 180, 250, 0.1);
 }
 
@@ -77,9 +77,9 @@
 /* Power button (shared component) */
 .power-btn {
   background: none;
-  border: 1px solid #45475a;
+  border: 1px solid var(--border-light);
   border-radius: 6px;
-  color: #a6adc8;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -91,8 +91,8 @@
 }
 
 .power-btn:hover:not(:disabled) {
-  color: #f38ba8;
-  border-color: #f38ba8;
+  color: var(--red);
+  border-color: var(--red);
   background: rgba(243, 139, 168, 0.1);
 }
 

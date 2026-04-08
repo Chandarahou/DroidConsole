@@ -71,7 +71,8 @@ DroidConsole runs as an Electron desktop app. The main process starts an Express
 | **Video Decoding** | WebCodecs API | - | Browser-native H.264 decoding |
 | **Virtual Input** | UHID | - | USB HID keyboard emulation |
 | **Packaging** | electron-builder | 26.x | .exe installer generation |
-| **Styling** | CSS (Catppuccin) | - | Dark theme UI |
+| **Styling** | CSS Variables (Catppuccin) | - | Night/Light theme support |
+| **Icon Embedding** | rcedit | - | Embed custom .ico into packaged .exe |
 
 ---
 
@@ -98,6 +99,7 @@ DroidConsole/
 │   │   │   ├── http-api.js      # REST API endpoints
 │   │   │   ├── ws-server.js     # WebSocket server (control/video/signaling)
 │   │   │   ├── batch-controller.js # Multi-device batch operations
+│   │   │   ├── warmup-manager.js # WhatsApp warm-up state machine + scheduling
 │   │   │   └── share-manager.js # Remote sharing token management
 │   │   └── utils/
 │   │       └── logger.js        # Logging utility
@@ -118,7 +120,9 @@ DroidConsole/
 │   │   │   ├── ConnectDialog.jsx # TCP/WiFi connect dialog
 │   │   │   ├── PowerButton.jsx  # Power toggle button
 │   │   │   ├── RotateButton.jsx # Screen rotation button
-│   │   │   └── BatchPanel.jsx   # Batch operations UI
+│   │   │   ├── BatchPanel.jsx   # Batch operations UI
+│   │   │   ├── WaRegisterPanel.jsx # WhatsApp registration automation (UHID)
+│   │   │   └── WaWarmupPanel.jsx # WhatsApp warm-up automation (5 phases)
 │   │   ├── hooks/
 │   │   │   └── useDevices.js    # WebSocket device state hook
 │   │   ├── services/
@@ -249,6 +253,13 @@ Three WebSocket endpoints using `noServer` mode (avoids Express 5 middleware con
 | POST | `/api/share/:token/revoke` | Revoke a share |
 | GET | `/api/network-info` | Get LAN IP addresses |
 | GET | `/api/health` | Health check |
+| POST | `/api/wa-register/type` | Type country code + phone via UHID and Tab-navigate |
+| POST | `/api/wa-register/batch` | Run WA Register flow on multiple devices |
+| GET | `/api/warmup/state` | Get warm-up state for all devices |
+| POST | `/api/warmup/start` | Start warm-up for selected devices (contacts, distribute, useBusiness) |
+| POST | `/api/warmup/stop` | Stop warm-up for a device |
+| POST | `/api/warmup/execute` | Execute one warm-up action immediately (`force=true` bypasses daily phase limit) |
+| GET | `/api/warmup/log/:serial` | Get activity log for a device |
 
 ### WebSocket Messages (Control)
 
@@ -258,6 +269,7 @@ Three WebSocket endpoints using `noServer` mode (avoids Express 5 middleware con
 { "type": "input:key", "data": { "serial": "...", "action": 0, "keyCode": 23, "repeat": 0, "metaState": 0 } }
 { "type": "input:text", "data": { "serial": "...", "text": "hello" } }
 { "type": "input:scroll", "data": { "serial": "...", "x": 0.5, "y": 0.5, "scrollX": 0, "scrollY": -1, "width": 1, "height": 1 } }
+{ "type": "input:clipboard", "data": { "serial": "...", "text": "hello", "paste": true } }
 ```
 
 **Server → Client:**
@@ -327,6 +339,94 @@ Android keycodes are mapped to USB HID scancodes:
 - Backspace, Tab, Space, Escape → corresponding HID keys
 
 Text input maps characters directly to HID key press/release sequences with shift handling.
+
+---
+
+## Clipboard Sync (PC ⇄ Phone)
+
+Browser `navigator.clipboard.readText()` is used to read the PC clipboard when the user presses **Ctrl+V** on a mirrored canvas. The text is sent to the backend via the `input:clipboard` WebSocket message and forwarded into a scrcpy `SET_CLIPBOARD` control message (type 9):
+
+```
+[u8 type=9] [u64 sequence=0] [u8 paste_flag] [u32 text_len] [text bytes]
+```
+
+When `paste=true`, scrcpy auto-pastes the clipboard contents into the focused input field on the phone. If the device is the master, clipboard is broadcast to all slave devices.
+
+Ctrl+C / Ctrl+X / Ctrl+A / Ctrl+Z are sent as Android letter keycodes (KEYCODE_A=29 .. KEYCODE_Z=54) with proper meta state (`META_CTRL_ON | META_CTRL_LEFT_ON`).
+
+---
+
+## Screen Rotation
+
+DroidConsole rotates the device screen using:
+
+```
+adb shell cmd window user-rotation lock <0|1>
+```
+
+This bypasses the `WRITE_SETTINGS` permission requirement of `settings put system user_rotation` and works on OPPO and other locked-down devices.
+
+---
+
+## WhatsApp Register Automation
+
+The WA Register feature drives the WhatsApp registration page using the **UHID virtual keyboard** (since WhatsApp blocks `inject_touch` and `inject_keycode` on this screen).
+
+Flow:
+1. User enters country code + phone number in the UI
+2. Backend types the country code via UHID
+3. Sends 1× Tab → types phone number
+4. Sends 1× Tab → Enter (next button)
+5. Sleeps 5 seconds
+6. Sends 2× Tab → Enter (confirm number dialog)
+
+---
+
+## WhatsApp Warm-Up
+
+The warm-up manager (`warmup-manager.js`) implements a 5-phase state machine that schedules WhatsApp messages over time to age accounts safely.
+
+### Phases
+
+| Phase | Daily Limit | Purpose |
+|-------|-------------|---------|
+| 1. Setup | small | Initial profile activity |
+| 2. Light | low | Manual-feeling messages |
+| 3. Moderate | medium | Slowly ramping volume |
+| 4. Scaling | higher | Approaching operational |
+| 5. Operational | full | Account is warm |
+
+### Action Execution
+
+Each action opens a chat to a contact via deep link:
+
+```
+am start -a android.intent.action.VIEW \
+  -d "https://api.whatsapp.com/send?phone=<NUMBER>" \
+  -p <com.whatsapp | com.whatsapp.w4b>
+```
+
+The `-p` package flag is critical — without it Android may pick WhatsApp Business when both apps are installed. The package is chosen from `state.options.useBusiness`.
+
+### Multi-Device Warm-Up
+
+- Multiple devices can warm up concurrently from the WaWarmupPanel
+- Contacts can be **distributed** across selected devices, or each device can use the full list
+- State is persisted per-device to `data/warmup/warmup-state.json`
+
+### Force Send
+
+`POST /api/warmup/execute` accepts `{ serial, force: true }`. When `force=true`, the daily phase limit check is skipped — useful for manual sends without waiting for the schedule.
+
+### Activity Log
+
+Each device maintains an action history readable via `GET /api/warmup/log/:serial`, displayed in an expandable section in the panel.
+
+---
+
+## Theming (Night/Light Mode)
+
+All component CSS uses CSS variables (Catppuccin palette). The theme is toggled by adding/removing a `data-theme="light"` attribute on `<html>`, which swaps the variable values. A sun/moon button in the header toggles the theme and persists the choice to `localStorage`.
 
 ---
 

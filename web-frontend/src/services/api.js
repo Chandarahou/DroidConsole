@@ -71,6 +71,30 @@ export const revokeShare = (token) =>
 export const validateShare = (token) =>
   request(`/api/share/${token}/validate`);
 
+// WhatsApp Register
+export const waRegisterType = (serial, phoneNumber, countryCode) =>
+  request('/api/wa-register/type', { method: 'POST', body: JSON.stringify({ serial, phoneNumber, countryCode }) });
+export const waRegisterBatch = (entries) =>
+  request('/api/wa-register/batch', { method: 'POST', body: JSON.stringify({ entries }) });
+
+// Warm-up
+export const getWarmupStatus = () => request('/api/warmup/status');
+export const getWarmupDevice = (serial) => request(`/api/warmup/${serial}`);
+export const startWarmup = (serial, contacts, options) =>
+  request('/api/warmup/start', { method: 'POST', body: JSON.stringify({ serial, contacts, options }) });
+export const stopWarmup = (serial) =>
+  request('/api/warmup/stop', { method: 'POST', body: JSON.stringify({ serial }) });
+export const pauseWarmup = (serial) =>
+  request('/api/warmup/pause', { method: 'POST', body: JSON.stringify({ serial }) });
+export const updateWarmupContacts = (serial, contacts) =>
+  request('/api/warmup/contacts', { method: 'POST', body: JSON.stringify({ serial, contacts }) });
+export const executeWarmupAction = (serial, force = false, message = undefined) =>
+  request('/api/warmup/execute', { method: 'POST', body: JSON.stringify({ serial, force, message }) });
+export const warmupAutoStart = (serial) =>
+  request('/api/warmup/auto-start', { method: 'POST', body: JSON.stringify({ serial }) });
+export const warmupAutoStop = (serial) =>
+  request('/api/warmup/auto-stop', { method: 'POST', body: JSON.stringify({ serial }) });
+
 // Network info
 export const getNetworkInfo = () => request('/api/network-info');
 

@@ -1,12 +1,12 @@
 .batch-panel {
-  background: #1e1e2e;
-  border: 1px solid #313244;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
 }
 
 .batch-panel h3 {
-  color: #cdd6f4;
+  color: var(--text);
   margin: 0 0 16px;
   font-size: 18px;
 }
@@ -16,7 +16,7 @@
 }
 
 .target-label {
-  color: #6c7086;
+  color: var(--text-dim);
   font-size: 13px;
   display: block;
   margin-bottom: 8px;
@@ -29,9 +29,9 @@
 }
 
 .chip {
-  background: #313244;
-  color: #a6adc8;
-  border: 1px solid #45475a;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
   border-radius: 16px;
   padding: 4px 12px;
   font-size: 12px;
@@ -40,9 +40,9 @@
 }
 
 .chip.active {
-  background: #89b4fa;
+  background: var(--accent);
   color: #1e1e2e;
-  border-color: #89b4fa;
+  border-color: var(--accent);
 }
 
 .batch-actions {
@@ -58,16 +58,16 @@
 
 .action-group input {
   flex: 1;
-  background: #313244;
-  border: 1px solid #45475a;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
-  color: #cdd6f4;
+  color: var(--text);
   padding: 8px 12px;
   font-size: 13px;
 }
 
 .action-group input::placeholder {
-  color: #585b70;
+  color: var(--text-faint);
 }
 
 .action-buttons {
@@ -76,7 +76,7 @@
 }
 
 .batch-loading {
-  color: #89b4fa;
+  color: var(--accent);
   font-size: 13px;
   margin-top: 12px;
   animation: pulse 1.5s infinite;
@@ -89,12 +89,12 @@
 
 .batch-results {
   margin-top: 16px;
-  border-top: 1px solid #313244;
+  border-top: 1px solid var(--border);
   padding-top: 12px;
 }
 
 .batch-results h4 {
-  color: #a6adc8;
+  color: var(--text-muted);
   margin: 0 0 8px;
   font-size: 14px;
 }
@@ -118,13 +118,13 @@
 }
 
 .result-serial {
-  color: #a6adc8;
+  color: var(--text-muted);
   font-family: monospace;
   min-width: 140px;
 }
 
 .result-status {
-  color: #cdd6f4;
+  color: var(--text);
   flex: 1;
 }
 

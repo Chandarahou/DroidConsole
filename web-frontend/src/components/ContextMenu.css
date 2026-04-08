@@ -3,8 +3,8 @@
 .ctx-menu {
   position: fixed;
   z-index: 9999;
-  background: #1e1e2e;
-  border: 1px solid #45475a;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   min-width: 180px;
@@ -14,10 +14,10 @@
 
 .ctx-header {
   padding: 8px 14px 6px;
-  color: #cdd6f4;
+  color: var(--text);
   font-weight: 600;
   font-size: 12px;
-  border-bottom: 1px solid #313244;
+  border-bottom: 1px solid var(--border);
   margin-bottom: 2px;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
 }
 
 .ctx-serial {
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 10px;
   font-weight: 400;
   font-family: monospace;
@@ -33,7 +33,7 @@
 
 .ctx-item {
   padding: 7px 14px;
-  color: #a6adc8;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -44,12 +44,12 @@
 
 .ctx-item:hover {
   background: rgba(137, 180, 250, 0.1);
-  color: #cdd6f4;
+  color: var(--text);
 }
 
 .ctx-arrow {
   font-size: 9px;
-  color: #585b70;
+  color: var(--text-faint);
 }
 
 /* Submenu */
@@ -62,8 +62,8 @@
   position: absolute;
   left: 100%;
   top: -4px;
-  background: #1e1e2e;
-  border: 1px solid #45475a;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   min-width: 150px;
@@ -73,7 +73,7 @@
 
 .ctx-sub-item {
   padding: 7px 14px;
-  color: #a6adc8;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -84,16 +84,16 @@
 
 .ctx-sub-item:hover {
   background: rgba(137, 180, 250, 0.1);
-  color: #cdd6f4;
+  color: var(--text);
 }
 
 .ctx-sub-item.current {
-  color: #89b4fa;
+  color: var(--accent);
 }
 
 .ctx-sub-item.ctx-remove {
-  color: #f38ba8;
-  border-bottom: 1px solid #313244;
+  color: var(--red);
+  border-bottom: 1px solid var(--border);
   margin-bottom: 2px;
 }
 
@@ -102,13 +102,13 @@
 }
 
 .ctx-check {
-  color: #a6e3a1;
+  color: var(--green);
   font-size: 12px;
 }
 
 .ctx-sub-empty {
   padding: 8px 14px;
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 11px;
   font-style: italic;
 }
@@ -124,17 +124,17 @@
 
 .ctx-rename-input {
   flex: 1;
-  background: #313244;
-  border: 1px solid #89b4fa;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
   border-radius: 4px;
-  color: #cdd6f4;
+  color: var(--text);
   padding: 4px 8px;
   font-size: 12px;
   outline: none;
 }
 
 .ctx-rename-ok {
-  background: #89b4fa;
+  background: var(--accent);
   color: #1e1e2e;
   border: none;
   border-radius: 4px;

@@ -537,6 +537,27 @@ export class ScrcpyClient extends EventEmitter {
     }
   }
 
+  /**
+   * Push text to the device clipboard, optionally pasting immediately.
+   * scrcpy v3 SET_CLIPBOARD message (type 9):
+   *   type(1) + sequence(8) + paste(1) + length(4) + text(length)
+   */
+  setClipboard(text, paste = true) {
+    if (!this.controlSocket || !this.running) return;
+
+    const textBytes = Buffer.from(text, 'utf8');
+    const buf = Buffer.alloc(1 + 8 + 1 + 4 + textBytes.length);
+    let offset = 0;
+    buf.writeUInt8(9, offset); offset += 1;                  // type: SET_CLIPBOARD
+    buf.writeBigUInt64BE(BigInt(0), offset); offset += 8;    // sequence (0 = no ack)
+    buf.writeUInt8(paste ? 1 : 0, offset); offset += 1;      // paste flag
+    buf.writeUInt32BE(textBytes.length, offset); offset += 4; // text length
+    textBytes.copy(buf, offset);                              // text bytes
+
+    this.controlSocket.write(buf);
+    log.debug('Clipboard set', { length: textBytes.length, paste });
+  }
+
   injectScroll(x, y, scrollX, scrollY, width, height) {
     if (!this.controlSocket || !this.running) return;
 

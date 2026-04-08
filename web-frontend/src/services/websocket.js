@@ -76,6 +76,10 @@ export class ControlSocket {
     this.send('input:scroll', { serial, x, y, scrollX, scrollY, width, height });
   }
 
+  sendClipboard(serial, text, paste = true) {
+    this.send('input:clipboard', { serial, text, paste });
+  }
+
   on(event, callback) {
     if (!this.listeners.has(event)) this.listeners.set(event, new Set());
     this.listeners.get(event).add(callback);

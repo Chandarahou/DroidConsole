@@ -1,7 +1,7 @@
 /* Laixi-style Groups panel inside sidebar */
 
 .gp-sidebar {
-  border-top: 1px solid #313244;
+  border-top: 1px solid var(--border);
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
 }
 
 .gp-header {
-  color: #cdd6f4;
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -48,11 +48,11 @@
 }
 
 .gp-dot.online {
-  background: #a6e3a1;
+  background: var(--green);
 }
 
 .gp-label {
-  color: #a6adc8;
+  color: var(--text-muted);
   font-size: 12px;
   flex: 1;
   white-space: nowrap;
@@ -61,11 +61,11 @@
 }
 
 .gp-row.active .gp-label {
-  color: #89b4fa;
+  color: var(--accent);
 }
 
 .gp-selected {
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 10px;
   white-space: nowrap;
 }
@@ -73,7 +73,7 @@
 .gp-delete {
   background: none;
   border: none;
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 12px;
   cursor: pointer;
   padding: 0 2px;
@@ -87,7 +87,7 @@
 }
 
 .gp-delete:hover {
-  color: #f38ba8;
+  color: var(--red);
 }
 
 /* Device number grid */
@@ -115,19 +115,19 @@
 }
 
 .gp-chip.active {
-  background: #313244;
-  color: #cdd6f4;
-  border: 1px solid #45475a;
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border-light);
 }
 
 .gp-chip.active:hover {
-  background: #45475a;
+  background: var(--bg-card-hover);
 }
 
 .gp-chip.dimmed {
-  background: #1e1e2e;
+  background: var(--bg-surface);
   color: #45475a;
-  border: 1px solid #313244;
+  border: 1px solid var(--border);
 }
 
 .gp-chip.clickable {
@@ -135,19 +135,19 @@
 }
 
 .gp-chip.clickable.dimmed:hover {
-  border-color: #a6e3a1;
-  color: #a6e3a1;
+  border-color: var(--green);
+  color: var(--green);
   background: rgba(166, 227, 161, 0.1);
 }
 
 .gp-chip.clickable.active:hover {
-  border-color: #f38ba8;
-  color: #f38ba8;
+  border-color: var(--red);
+  color: var(--red);
   background: rgba(243, 139, 168, 0.1);
 }
 
 .gp-hint {
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 10px;
   text-align: center;
 }
@@ -166,24 +166,24 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  border-top: 1px solid #313244;
+  border-top: 1px solid var(--border);
   padding-top: 8px;
   margin-top: 2px;
 }
 
 .gp-create-input {
   flex: 1;
-  background: #313244;
-  border: 1px solid #45475a;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 4px;
-  color: #cdd6f4;
+  color: var(--text);
   padding: 4px 8px;
   font-size: 11px;
   min-width: 0;
 }
 
 .gp-create-input::placeholder {
-  color: #585b70;
+  color: var(--text-faint);
 }
 
 .gp-char-count {
@@ -193,7 +193,7 @@
 }
 
 .gp-add-btn {
-  background: #89b4fa;
+  background: var(--accent);
   color: #1e1e2e;
   border: none;
   border-radius: 4px;

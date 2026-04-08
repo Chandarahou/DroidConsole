@@ -1,6 +1,6 @@
 .share-view {
   min-height: 100vh;
-  background: #11111b;
+  background: var(--bg-base);
   display: flex;
   flex-direction: column;
 }
@@ -13,7 +13,7 @@
 }
 
 .share-loading {
-  color: #89b4fa;
+  color: var(--accent);
   font-size: 16px;
   animation: share-pulse 1.5s infinite;
 }
@@ -29,13 +29,13 @@
 }
 
 .share-error h2 {
-  color: #f38ba8;
+  color: var(--red);
   font-size: 22px;
   margin-bottom: 8px;
 }
 
 .share-error p {
-  color: #6c7086;
+  color: var(--text-dim);
   font-size: 14px;
 }
 
@@ -46,8 +46,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 24px;
-  background: #181825;
-  border-bottom: 1px solid #313244;
+  background: var(--bg-overlay);
+  border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -60,13 +60,13 @@
 }
 
 .share-view-header h2 {
-  color: #cdd6f4;
+  color: var(--text);
   font-size: 18px;
 }
 
 .share-view-badge {
   background: rgba(137, 180, 250, 0.15);
-  color: #89b4fa;
+  color: var(--accent);
   font-size: 11px;
   font-weight: 600;
   padding: 3px 10px;
@@ -74,12 +74,12 @@
 }
 
 .share-view-count {
-  color: #a6adc8;
+  color: var(--text-muted);
   font-size: 13px;
 }
 
 .share-view-expiry {
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 12px;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .grid-selector {
-  color: #6c7086;
+  color: var(--text-dim);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -98,10 +98,10 @@
 }
 
 .grid-selector select {
-  background: #313244;
-  border: 1px solid #45475a;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 6px;
-  color: #cdd6f4;
+  color: var(--text);
   padding: 4px 8px;
   font-size: 12px;
 }
@@ -135,27 +135,27 @@
 }
 
 .share-dot.online {
-  background: #a6e3a1;
+  background: var(--green);
 }
 
 .share-dot.offline {
-  background: #f38ba8;
+  background: var(--red);
 }
 
 .share-device-title {
-  color: #cdd6f4;
+  color: var(--text);
   font-size: 13px;
   font-weight: 600;
 }
 
 .share-device-offline {
-  background: #1e1e2e;
-  border: 1px solid #313244;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 13px;
 }
 

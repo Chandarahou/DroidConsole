@@ -1,12 +1,12 @@
 .received-panel {
-  background: #1e1e2e;
-  border: 1px solid #313244;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
 }
 
 .received-panel h3 {
-  color: #cdd6f4;
+  color: var(--text);
   margin: 0 0 16px;
   font-size: 18px;
 }
@@ -21,7 +21,7 @@
 }
 
 .received-label {
-  color: #a6adc8;
+  color: var(--text-muted);
   font-size: 13px;
   font-weight: 600;
 }
@@ -33,26 +33,26 @@
 
 .received-code-input {
   flex: 1;
-  background: #313244;
-  border: 1px solid #45475a;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
-  color: #cdd6f4;
+  color: var(--text);
   padding: 10px 12px;
   font-size: 13px;
   font-family: monospace;
 }
 
 .received-code-input::placeholder {
-  color: #585b70;
+  color: var(--text-faint);
 }
 
 .received-error {
-  color: #f38ba8;
+  color: var(--red);
   font-size: 12px;
 }
 
 .received-hint {
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 11px;
   line-height: 1.4;
 }
@@ -60,7 +60,7 @@
 .received-empty {
   text-align: center;
   padding: 30px 20px;
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 13px;
 }
 
@@ -77,7 +77,7 @@
 }
 
 .received-connections h4 {
-  color: #a6adc8;
+  color: var(--text-muted);
   margin: 0;
   font-size: 14px;
 }
@@ -85,8 +85,8 @@
 /* Single connection card */
 
 .received-conn {
-  background: #181825;
-  border: 1px solid #313244;
+  background: var(--bg-overlay);
+  border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -112,21 +112,21 @@
 .received-expand-btn {
   background: none;
   border: none;
-  color: #585b70;
+  color: var(--text-faint);
   cursor: pointer;
   font-size: 10px;
   padding: 2px 4px;
 }
 
 .received-conn-name {
-  color: #a6e3a1;
+  color: var(--green);
   font-size: 13px;
   font-weight: 600;
 }
 
 .received-conn-badge {
   background: rgba(137, 180, 250, 0.15);
-  color: #89b4fa;
+  color: var(--accent);
   font-size: 10px;
   font-weight: 600;
   padding: 2px 8px;
@@ -134,12 +134,12 @@
 }
 
 .received-conn-count {
-  color: #a6adc8;
+  color: var(--text-muted);
   font-size: 12px;
 }
 
 .received-conn-expiry {
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 11px;
 }
 
@@ -167,7 +167,7 @@
   appearance: none;
   height: 4px;
   border-radius: 2px;
-  background: #313244;
+  background: var(--bg-card);
   outline: none;
 }
 
@@ -177,7 +177,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #89b4fa;
+  background: var(--accent);
   cursor: pointer;
 }
 
@@ -185,7 +185,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #89b4fa;
+  background: var(--accent);
   cursor: pointer;
   border: none;
 }
@@ -219,27 +219,27 @@
 }
 
 .received-dot.online {
-  background: #a6e3a1;
+  background: var(--green);
 }
 
 .received-dot.offline {
-  background: #f38ba8;
+  background: var(--red);
 }
 
 .received-device-title {
-  color: #cdd6f4;
+  color: var(--text);
   font-size: 13px;
   font-weight: 600;
 }
 
 .received-device-offline {
-  background: #1e1e2e;
-  border: 1px solid #313244;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #585b70;
+  color: var(--text-faint);
   font-size: 13px;
 }
 
