@@ -77,7 +77,9 @@ export class WarmupManager extends EventEmitter {
       const data = Object.fromEntries(this.devices);
       writeFileSync(getDataFile(), JSON.stringify(data, null, 2));
     } catch (err) {
-      log.warn('Failed to save warm-up state', { error: err.message });
+      // Loud — if this fires, restart will lose state. Most common cause:
+      // DATA_DIR resolved into app.asar (read-only) instead of userData.
+      log.error('Failed to save warm-up state', { error: err.message, dataDir: DATA_DIR });
     }
   }
 

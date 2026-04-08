@@ -9,6 +9,9 @@ const POLL_INTERVAL = 3000;
 const NICKNAMES_FILE = process.env.NICKNAMES_PATH ||
   decodeURIComponent(new URL('../../data/nicknames.json', import.meta.url).pathname)
     .replace(/^\/([A-Za-z]:)/, '$1');
+const GROUPS_FILE = process.env.GROUPS_PATH ||
+  decodeURIComponent(new URL('../../data/groups.json', import.meta.url).pathname)
+    .replace(/^\/([A-Za-z]:)/, '$1');
 
 export class DeviceManager extends EventEmitter {
   constructor() {
@@ -18,6 +21,43 @@ export class DeviceManager extends EventEmitter {
     this.masterSerial = null;
     this.pollTimer = null;
     this.nicknames = this._loadNicknames();
+    this._loadGroups();
+  }
+
+  _loadGroups() {
+    try {
+      if (existsSync(GROUPS_FILE)) {
+        const data = JSON.parse(readFileSync(GROUPS_FILE, 'utf8'));
+        for (const g of data) {
+          // Stored shape matches in-memory shape: { id, name, deviceSerials: [] }
+          this.groups.set(g.id, { id: g.id, name: g.name, deviceSerials: g.deviceSerials || [] });
+        }
+        log.info('Loaded groups', { count: this.groups.size });
+      }
+    } catch (err) {
+      log.warn('Failed to load groups', { error: err.message });
+    }
+  }
+
+  _saveGroups() {
+    try {
+      const dir = dirname(GROUPS_FILE);
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+      writeFileSync(GROUPS_FILE, JSON.stringify(Array.from(this.groups.values()), null, 2));
+    } catch (err) {
+      // Loud — silent persistence failures cost us once already with warm-up.
+      log.error('Failed to save groups', { error: err.message, file: GROUPS_FILE });
+    }
+  }
+
+  // Look up which group a serial belongs to from the in-memory groups map.
+  // Used when a device first appears so we can re-attach groupId from a
+  // restored group file before any device record existed for it.
+  _findGroupForSerial(serial) {
+    for (const g of this.groups.values()) {
+      if (g.deviceSerials.includes(serial)) return g.id;
+    }
+    return null;
   }
 
   _loadNicknames() {
@@ -78,7 +118,9 @@ export class DeviceManager extends EventEmitter {
             ...adbDev,
             ...info,
             nickname: this.nicknames.get(adbDev.serial) || null,
-            groupId: null,
+            // Re-attach groupId from persisted groups so the device shows up
+            // inside its group immediately after restart.
+            groupId: this._findGroupForSerial(adbDev.serial),
             isMaster: false,
             mirrorState: 'idle',
             connectedAt: Date.now(),
@@ -155,6 +197,7 @@ export class DeviceManager extends EventEmitter {
   createGroup(name) {
     const id = `group_${Date.now()}`;
     this.groups.set(id, { id, name, deviceSerials: [] });
+    this._saveGroups();
     this.emit('groups:updated', this.getAllGroups());
     return id;
   }
@@ -167,6 +210,7 @@ export class DeviceManager extends EventEmitter {
       if (device) device.groupId = null;
     }
     this.groups.delete(groupId);
+    this._saveGroups();
     this.emit('groups:updated', this.getAllGroups());
     return true;
   }
@@ -174,15 +218,23 @@ export class DeviceManager extends EventEmitter {
   addDeviceToGroup(serial, groupId) {
     const group = this.groups.get(groupId);
     const device = this.devices.get(serial);
-    if (!group || !device) return false;
+    // Allow adding by serial even if the device record doesn't exist yet
+    // (e.g., restored from disk before first ADB poll completes).
+    if (!group) return false;
 
-    if (device.groupId) {
-      this.removeDeviceFromGroup(serial, device.groupId);
+    const previousGroupId = device?.groupId || this._findGroupForSerial(serial);
+    if (previousGroupId && previousGroupId !== groupId) {
+      this.removeDeviceFromGroup(serial, previousGroupId);
     }
 
-    group.deviceSerials.push(serial);
-    device.groupId = groupId;
-    this.emit('device:updated', device);
+    if (!group.deviceSerials.includes(serial)) {
+      group.deviceSerials.push(serial);
+    }
+    if (device) {
+      device.groupId = groupId;
+      this.emit('device:updated', device);
+    }
+    this._saveGroups();
     this.emit('groups:updated', this.getAllGroups());
     return true;
   }
@@ -194,6 +246,7 @@ export class DeviceManager extends EventEmitter {
 
     group.deviceSerials = group.deviceSerials.filter(s => s !== serial);
     if (device) device.groupId = null;
+    this._saveGroups();
     this.emit('groups:updated', this.getAllGroups());
     return true;
   }

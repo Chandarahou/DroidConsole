@@ -13,6 +13,10 @@ const ROOT = path.resolve(__dirname, '..');
 if (app.isPackaged) {
   process.env.SCRCPY_JAR_PATH = path.join(process.resourcesPath, 'vendor', 'scrcpy-server.jar');
   process.env.NICKNAMES_PATH = path.join(app.getPath('userData'), 'nicknames.json');
+  process.env.GROUPS_PATH = path.join(app.getPath('userData'), 'groups.json');
+  // Warm-up state must live in userData (writable). Otherwise warmup-manager
+  // tries to write into app.asar (read-only) and silently loses state.
+  process.env.WARMUP_DATA_PATH = path.join(app.getPath('userData'), 'warmup');
 }
 
 // --- Import backend modules (desktop-host) ---

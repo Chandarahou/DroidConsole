@@ -167,11 +167,25 @@ export function WaWarmupPanel({ devices }) {
         </div>
       </div>
 
-      {/* Start new warm-up */}
-      {devicesWithoutWarmup.length > 0 && (
-        <div className="wu-start-section">
-          <div className="wu-start-title">Start Warm-Up</div>
+      {/* Start / Add warm-up.
+          Always render the section so it stays discoverable when active
+          warm-ups already exist. Show a hint when no eligible devices are
+          available so the user understands why the form is empty. */}
+      <div className="wu-start-section">
+        <div className="wu-start-title">
+          {warmupEntries.length > 0 ? 'Add Another Device to Warm-Up' : 'Start Warm-Up'}
+        </div>
 
+        {devicesWithoutWarmup.length === 0 && (
+          <p className="wu-hint">
+            {activeDevices.length === 0
+              ? 'No devices connected. Connect a device via USB to start.'
+              : 'All connected devices are already in warm-up. Connect another device to add it.'}
+          </p>
+        )}
+
+        {devicesWithoutWarmup.length > 0 && (
+          <>
           <div className="wu-form-row">
             <label>
               Devices ({selectedSerials.length} / {devicesWithoutWarmup.length} selected)
@@ -254,10 +268,11 @@ export function WaWarmupPanel({ devices }) {
             onClick={handleStart}
             disabled={selectedSerials.length === 0 || !contactsText.trim()}
           >
-            Start Warm-Up on {selectedSerials.length} Device{selectedSerials.length !== 1 ? 's' : ''}
+            {warmupEntries.length > 0 ? 'Add' : 'Start Warm-Up on'} {selectedSerials.length} Device{selectedSerials.length !== 1 ? 's' : ''}
           </button>
-        </div>
-      )}
+          </>
+        )}
+      </div>
 
       {/* Active warm-ups */}
       {warmupEntries.length > 0 && (
@@ -398,9 +413,6 @@ export function WaWarmupPanel({ devices }) {
         </div>
       )}
 
-      {warmupEntries.length === 0 && devicesWithoutWarmup.length === 0 && (
-        <div className="wu-empty">No devices connected. Connect devices to start warm-up.</div>
-      )}
     </div>
   );
 }
