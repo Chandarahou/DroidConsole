@@ -47,8 +47,13 @@ export function ReceivedPanel() {
 
     if (!hostPart || !token) return null;
 
-    const hostUrl = `http://${hostPart}`;
-    const wsBase = `ws://${hostPart}`;
+    // Detect tunnel URLs (e.g. xxx.loca.lt) — they require https/wss.
+    // LAN addresses (ip:port) use plain http/ws.
+    const isTunnel = hostPart.includes('.loca.lt') || hostPart.includes('.ngrok');
+    const protocol = isTunnel ? 'https' : 'http';
+    const wsProtocol = isTunnel ? 'wss' : 'ws';
+    const hostUrl = `${protocol}://${hostPart}`;
+    const wsBase = `${wsProtocol}://${hostPart}`;
     return { hostUrl, wsBase, token };
   };
 
@@ -172,7 +177,7 @@ export function ReceivedPanel() {
         {error && <p className="received-error">{error}</p>}
         <p className="received-hint">
           Get a share code from someone running DroidConsole with connected devices.
-          Works on the same LAN. For internet, the sharer must have port 3001 forwarded.
+          Works on the same LAN. For internet, the sharer can enable Internet Sharing in the Remote Share tab (no port forwarding needed).
         </p>
       </div>
 
@@ -538,7 +543,7 @@ function mapKeyCode(code) {
   const MAP = {
     ArrowUp: 19, ArrowDown: 20, ArrowLeft: 21, ArrowRight: 22,
     Escape: 4, Home: 3, F5: 82,
-    Backspace: 67, Delete: 112, Enter: 66, Tab: 61, Space: 62,
+    Backspace: 67, Delete: 112, Enter: 23, Tab: 61, Space: 62,
     VolumeUp: 24, VolumeDown: 25, F1: 224, F2: 225,
   };
   return MAP[code] ?? null;

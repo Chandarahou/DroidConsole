@@ -3,11 +3,11 @@ import * as api from '../services/api';
 import './WaWarmupPanel.css';
 
 const PHASES = {
-  1: { name: 'Setup', desc: 'Profile setup only, no messages' },
-  2: { name: 'Light', desc: '3-5 messages/day to friendly numbers' },
-  3: { name: 'Moderate', desc: '10-15 messages/day, join groups' },
-  4: { name: 'Scaling', desc: '20-30 messages/day, new contacts' },
-  5: { name: 'Operational', desc: 'Full volume ready' },
+  1: { name: 'Setup', maxMessages: 0, desc: 'Profile setup only, no messages' },
+  2: { name: 'Light', maxMessages: 5, desc: '3-5 messages/day to friendly numbers' },
+  3: { name: 'Moderate', maxMessages: 15, desc: '10-15 messages/day, join groups' },
+  4: { name: 'Scaling', maxMessages: 30, desc: '20-30 messages/day, new contacts' },
+  5: { name: 'Operational', maxMessages: 100, desc: 'Full volume ready' },
 };
 
 export function WaWarmupPanel({ devices }) {

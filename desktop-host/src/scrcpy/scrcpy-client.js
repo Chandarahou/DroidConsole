@@ -271,6 +271,8 @@ export class ScrcpyClient extends EventEmitter {
           this.controlSocket.on('error', (err) => {
             log.error('Control socket error', { error: err.message });
             clearTimeout(timer);
+            // Clean up the already-connected video socket to prevent leak
+            try { this.videoSocket.destroy(); } catch {}
             reject(err);
           });
         }, 200);
@@ -279,6 +281,8 @@ export class ScrcpyClient extends EventEmitter {
       this.videoSocket.on('error', (err) => {
         log.error('Video socket error', { error: err.message });
         clearTimeout(timer);
+        // Clean up control socket if it was already created
+        try { if (this.controlSocket) this.controlSocket.destroy(); } catch {}
         reject(err);
       });
     });

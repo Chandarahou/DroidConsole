@@ -8,6 +8,9 @@ export function BatchPanel({ devices, selectedSerials, onSelectionChange }) {
   const [apkPath, setApkPath] = useState('');
   const [packageName, setPackageName] = useState('');
   const [shellCmd, setShellCmd] = useState('');
+  const [transferFile, setTransferFile] = useState(null);
+  const [remotePath, setRemotePath] = useState('/sdcard/Download/');
+  const [transferProgress, setTransferProgress] = useState('');
 
   const serials = selectedSerials.length > 0
     ? selectedSerials
@@ -19,6 +22,13 @@ export function BatchPanel({ devices, selectedSerials, onSelectionChange }) {
     try {
       let res;
       switch (action) {
+        case 'push-file':
+          if (!transferFile) return;
+          setTransferProgress(`Uploading ${transferFile.name}...`);
+          res = await api.batchPushFile(serials, transferFile, remotePath.trim() || '/sdcard/Download/');
+          setTransferProgress('');
+          setTransferFile(null);
+          break;
         case 'install':
           if (!apkPath.trim()) return;
           res = await api.batchInstallApk(serials, apkPath.trim());
@@ -68,13 +78,47 @@ export function BatchPanel({ devices, selectedSerials, onSelectionChange }) {
               className={`chip ${selectedSerials.includes(d.serial) || selectedSerials.length === 0 ? 'active' : ''}`}
               onClick={() => toggleDevice(d.serial)}
             >
-              {d.nickname || d.model}
+              {d.nickname || d.deviceName || d.model}
             </button>
           ))}
         </div>
       </div>
 
       <div className="batch-actions">
+        <div className="action-group file-transfer-group">
+          <label className="file-transfer-label">File Transfer (PC → Phone)</label>
+          <div className="file-transfer-row">
+            <label className="file-pick-btn btn btn-secondary">
+              {transferFile ? transferFile.name : 'Choose File'}
+              <input
+                type="file"
+                style={{ display: 'none' }}
+                onChange={e => setTransferFile(e.target.files[0] || null)}
+              />
+            </label>
+            <input
+              placeholder="Destination: /sdcard/Download/"
+              value={remotePath}
+              onChange={e => setRemotePath(e.target.value)}
+              className="remote-path-input"
+            />
+            <button
+              className="btn btn-primary"
+              onClick={() => handleAction('push-file')}
+              disabled={loading || !transferFile}
+            >
+              {loading && transferProgress ? 'Pushing...' : 'Push File'}
+            </button>
+          </div>
+          {transferFile && (
+            <div className="file-info">
+              {transferFile.name} ({(transferFile.size / 1024 / 1024).toFixed(1)} MB)
+              → {serials.length} device{serials.length !== 1 ? 's' : ''}
+            </div>
+          )}
+          {transferProgress && <div className="transfer-progress">{transferProgress}</div>}
+        </div>
+
         <div className="action-group">
           <input
             placeholder="APK path on host PC..."

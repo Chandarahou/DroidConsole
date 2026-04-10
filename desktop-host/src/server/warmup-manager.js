@@ -309,6 +309,9 @@ export class WarmupManager extends EventEmitter {
     if (!state || state.paused) return false;
 
     const runNext = async () => {
+      // Check if auto-run was stopped while we were awaiting
+      if (!this.running.has(serial)) return;
+
       const st = this.devices.get(serial);
       if (!st || st.paused) { this.stopAutoRun(serial); return; }
 
@@ -322,6 +325,11 @@ export class WarmupManager extends EventEmitter {
       }
 
       await this.executeAction(serial);
+
+      // Re-check after async executeAction — stopAutoRun may have been
+      // called while we were awaiting. Without this guard the new timer
+      // would silently resurrect a stopped auto-run.
+      if (!this.running.has(serial)) return;
 
       // Schedule next with random delay
       const delayMs = (st.options.delayMin + Math.random() * (st.options.delayMax - st.options.delayMin)) * 1000;

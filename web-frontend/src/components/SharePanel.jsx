@@ -14,13 +14,33 @@ export function SharePanel({ devices }) {
   const [editingToken, setEditingToken] = useState(null);
   const [editSerials, setEditSerials] = useState([]);
   const [networkInfo, setNetworkInfo] = useState(null);
+  const [tunnelUrl, setTunnelUrl] = useState(null);
+  const [tunnelLoading, setTunnelLoading] = useState(false);
 
   useEffect(() => {
     loadShares();
     api.getNetworkInfo().then(setNetworkInfo).catch(() => {});
+    api.getTunnelStatus().then(s => { if (s.active) setTunnelUrl(s.url); }).catch(() => {});
     const interval = setInterval(loadShares, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleStartTunnel = async () => {
+    setTunnelLoading(true);
+    try {
+      const res = await api.startTunnel();
+      setTunnelUrl(res.url);
+    } catch (err) {
+      alert('Failed to start tunnel: ' + err.message);
+    } finally {
+      setTunnelLoading(false);
+    }
+  };
+
+  const handleStopTunnel = async () => {
+    await api.stopTunnel();
+    setTunnelUrl(null);
+  };
 
   const loadShares = async () => {
     try {
@@ -57,10 +77,16 @@ export function SharePanel({ devices }) {
     setCreating(true);
     try {
       const res = await api.createShare(selectedSerials, getExpiryMinutes(), permissions, shareName.trim());
-      // Build a LAN-accessible URL using the detected IP
-      const lanIp = networkInfo?.addresses?.[0]?.address || window.location.hostname;
-      const port = networkInfo?.port || 3001;
-      setNewShareUrl(`${lanIp}:${port}|${res.share.token}`);
+      // If tunnel is active, use the internet URL; otherwise use LAN IP
+      if (tunnelUrl) {
+        // Strip protocol (https://) for share code format
+        const host = tunnelUrl.replace(/^https?:\/\//, '');
+        setNewShareUrl(`${host}|${res.share.token}`);
+      } else {
+        const lanIp = networkInfo?.addresses?.[0]?.address || window.location.hostname;
+        const port = networkInfo?.port || 3001;
+        setNewShareUrl(`${lanIp}:${port}|${res.share.token}`);
+      }
       loadShares();
     } catch (err) {
       alert('Failed to create share: ' + err.message);
@@ -94,6 +120,44 @@ export function SharePanel({ devices }) {
   return (
     <div className="share-panel">
       <h3>Remote Sharing</h3>
+
+      {/* Internet Tunnel */}
+      <div className="tunnel-section">
+        <div className="tunnel-header">
+          <span className="tunnel-title">Share over Internet</span>
+          <span className={`tunnel-status ${tunnelUrl ? 'active' : ''}`}>
+            {tunnelUrl ? 'Active' : 'Off'}
+          </span>
+        </div>
+        {!tunnelUrl ? (
+          <div className="tunnel-body">
+            <p className="tunnel-desc">
+              Enable internet sharing to let anyone outside your LAN connect — no port forwarding needed.
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={handleStartTunnel}
+              disabled={tunnelLoading}
+            >
+              {tunnelLoading ? 'Starting tunnel...' : 'Enable Internet Sharing'}
+            </button>
+          </div>
+        ) : (
+          <div className="tunnel-body">
+            <p className="tunnel-desc tunnel-active-desc">
+              Internet sharing is active. Create a share below — the share code will
+              automatically use the internet URL so anyone can connect.
+            </p>
+            <div className="tunnel-url-box">
+              <input readOnly value={tunnelUrl} />
+              <button className="btn btn-secondary" onClick={() => copyToClipboard(tunnelUrl)}>Copy URL</button>
+            </div>
+            <button className="btn btn-small btn-danger tunnel-stop-btn" onClick={handleStopTunnel}>
+              Disable Internet Sharing
+            </button>
+          </div>
+        )}
+      </div>
 
       <div className="share-create">
         {/* Share Name */}
@@ -186,7 +250,7 @@ export function SharePanel({ devices }) {
             <p className="share-url-hint">
               The receiver pastes this in their DroidConsole app under "Received" tab to connect.
             </p>
-            {networkInfo && networkInfo.addresses.length > 1 && (
+            {networkInfo?.addresses?.length > 1 && (
               <details className="share-ip-details">
                 <summary>Other network addresses</summary>
                 {networkInfo.addresses.map((a, i) => {

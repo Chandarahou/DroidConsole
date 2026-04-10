@@ -57,6 +57,11 @@ export class BatchController {
     return this._runOnDevices(serials, (serial) => adbClient.screenshot(serial));
   }
 
+  async pushFile(serials, localPath, remotePath) {
+    log.info('Batch push file', { serials, localPath, remotePath });
+    return this._runOnDevices(serials, (serial) => adbClient.pushFile(serial, localPath, remotePath));
+  }
+
   // --- Input Broadcast (Master -> Slaves) ---
 
   broadcastTouch(action, x, y, width, height) {

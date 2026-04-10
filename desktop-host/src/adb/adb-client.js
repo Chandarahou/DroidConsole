@@ -180,9 +180,11 @@ export class AdbClient {
     return result.includes('connected');
   }
 
-  async disconnectTcpDevice(ip, port = 5555) {
-    const result = await this.exec(['disconnect', `${ip}:${port}`]);
-    log.info('TCP disconnect', { ip, port, result });
+  async disconnectTcpDevice(target) {
+    // target can be "ip:port" serial or just an ip
+    const addr = target.includes(':') ? target : `${target}:5555`;
+    const result = await this.exec(['disconnect', addr]);
+    log.info('TCP disconnect', { target: addr, result });
     return true;
   }
 

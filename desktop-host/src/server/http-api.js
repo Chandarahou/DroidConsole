@@ -2,6 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { networkInterfaces } from 'node:os';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { unlinkSync } from 'node:fs';
+import multer from 'multer';
 import { deviceManager } from '../adb/device-manager.js';
 import { sessionManager } from '../scrcpy/session-manager.js';
 import { batchController } from './batch-controller.js';
@@ -9,6 +13,15 @@ import { adbClient } from '../adb/adb-client.js';
 import { shareManager } from './share-manager.js';
 import { warmupManager } from './warmup-manager.js';
 import { createLogger } from '../utils/logger.js';
+
+// Multer: store uploaded files in system temp dir, preserve original filename
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, tmpdir()),
+    filename: (req, file, cb) => cb(null, `droidconsole_${Date.now()}_${file.originalname}`),
+  }),
+  limits: { fileSize: 2 * 1024 * 1024 * 1024 }, // 2 GB max
+});
 
 const log = createLogger('HTTP');
 
@@ -157,6 +170,27 @@ export function createHttpServer() {
         image: r.data ? `data:image/png;base64,${r.data.toString('base64')}` : null,
       })),
     });
+  });
+
+  // --- File Transfer (PC → Phone) ---
+  // Accepts multipart upload, pushes the file to selected devices via ADB.
+  app.post('/api/batch/push-file', upload.single('file'), async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const serials = JSON.parse(req.body.serials || '[]');
+    const remotePath = (req.body.remotePath || '/sdcard/Download/').replace(/\/$/, '')
+      + '/' + req.file.originalname;
+    const localPath = req.file.path;
+
+    try {
+      const results = await batchController.pushFile(serials, localPath, remotePath);
+      res.json({ results, fileName: req.file.originalname, remotePath });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    } finally {
+      // Clean up temp file
+      try { unlinkSync(localPath); } catch { /* ignore */ }
+    }
   });
 
   // --- WhatsApp Register (UHID typing) ---
@@ -391,6 +425,51 @@ export function createHttpServer() {
     }
     const port = parseInt(process.env.PORT || '3001', 10);
     res.json({ addresses, port });
+  });
+
+  // --- Internet Tunnel (localtunnel) ---
+  let activeTunnel = null;
+
+  app.post('/api/tunnel/start', async (req, res) => {
+    if (activeTunnel) {
+      return res.json({ url: activeTunnel.url, already: true });
+    }
+    try {
+      const localtunnel = (await import('localtunnel')).default;
+      const port = parseInt(process.env.PORT || '3001', 10);
+      const tunnel = await localtunnel({ port });
+      activeTunnel = tunnel;
+
+      tunnel.on('close', () => {
+        log.info('Tunnel closed');
+        activeTunnel = null;
+      });
+      tunnel.on('error', (err) => {
+        log.error('Tunnel error', { error: err.message });
+        activeTunnel = null;
+      });
+
+      log.info('Tunnel opened', { url: tunnel.url });
+      res.json({ url: tunnel.url });
+    } catch (err) {
+      log.error('Failed to open tunnel', { error: err.message });
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/tunnel/stop', (req, res) => {
+    if (activeTunnel) {
+      activeTunnel.close();
+      activeTunnel = null;
+    }
+    res.json({ success: true });
+  });
+
+  app.get('/api/tunnel/status', (req, res) => {
+    res.json({
+      active: !!activeTunnel,
+      url: activeTunnel?.url || null,
+    });
   });
 
   // --- Health ---

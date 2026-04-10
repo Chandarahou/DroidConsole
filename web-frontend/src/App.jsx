@@ -132,6 +132,7 @@ function App() {
     { id: 'wa-warmup', label: 'WA Warm-Up', icon: '\u{1F525}' },
     { id: 'share', label: 'Remote Share', icon: '\u{1F517}' },
     { id: 'received', label: 'Received', icon: '\u{1F4E5}' },
+    { id: 'batch', label: 'Batch / File Transfer', icon: '\u{1F4E6}' },
     { id: 'display', label: 'Display Settings', icon: '\u{1F4BB}' },
   ];
 

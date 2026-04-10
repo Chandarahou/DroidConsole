@@ -132,3 +132,63 @@
   max-width: 120px;
   border-radius: 6px;
 }
+
+/* --- File Transfer --- */
+
+.file-transfer-group {
+  flex-direction: column !important;
+  background: var(--bg-overlay, var(--bg-card));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.file-transfer-label {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.file-transfer-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.file-pick-btn {
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-size: 12px;
+}
+
+.remote-path-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.remote-path-input::placeholder {
+  color: var(--text-faint);
+}
+
+.file-info {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.transfer-progress {
+  color: var(--accent);
+  font-size: 12px;
+  margin-top: 4px;
+  animation: pulse 1.5s infinite;
+}

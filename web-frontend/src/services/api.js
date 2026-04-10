@@ -60,6 +60,25 @@ export const batchShell = (serials, command) =>
 export const batchScreenshot = (serials) =>
   request('/api/batch/screenshot', { method: 'POST', body: JSON.stringify({ serials }) });
 
+// File Transfer — uses FormData (multipart), not JSON
+export async function batchPushFile(serials, file, remotePath) {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('serials', JSON.stringify(serials));
+  form.append('remotePath', remotePath);
+
+  const res = await fetch(`${API_BASE}/api/batch/push-file`, {
+    method: 'POST',
+    body: form,
+    // No Content-Type header — browser sets multipart boundary automatically
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || res.statusText);
+  }
+  return res.json();
+}
+
 // Share
 export const createShare = (serials, expiresInMinutes, permissions, name) =>
   request('/api/share/create', { method: 'POST', body: JSON.stringify({ serials, expiresInMinutes, permissions, name }) });
@@ -98,11 +117,22 @@ export const warmupAutoStop = (serial) =>
 // Network info
 export const getNetworkInfo = () => request('/api/network-info');
 
+// Internet Tunnel
+export const startTunnel = () => request('/api/tunnel/start', { method: 'POST' });
+export const stopTunnel = () => request('/api/tunnel/stop', { method: 'POST' });
+export const getTunnelStatus = () => request('/api/tunnel/status');
+
 // --- Remote host helpers (for connecting to another APM instance) ---
 
 export function remoteRequest(hostUrl, path, options = {}) {
   return fetch(`${hostUrl}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      // localtunnel shows an auth/reminder page unless this header is set.
+      // Safe to send on all remote requests — non-localtunnel hosts ignore it.
+      'Bypass-Tunnel-Reminder': 'true',
+      ...options.headers,
+    },
     ...options,
   }).then(async (res) => {
     if (!res.ok) {
