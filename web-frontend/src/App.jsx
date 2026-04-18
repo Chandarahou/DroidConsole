@@ -41,12 +41,31 @@ function App() {
   const [displayScale, setDisplayScale] = useState(
     () => parseInt(localStorage.getItem('displayScale') || '50', 10)
   );
+  const [mainDisplayScale, setMainDisplayScale] = useState(
+    () => parseInt(localStorage.getItem('mainDisplayScale') || '50', 10)
+  );
+  const [viewportSize, setViewportSize] = useState(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }));
 
   // Apply theme class to root
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // --- Auto-start mirror for all connected devices ---
   const autoMirroredRef = useRef(new Set());
@@ -78,8 +97,25 @@ function App() {
     localStorage.setItem('displayScale', String(val));
   }, []);
 
+  const handleMainScaleChange = useCallback((val) => {
+    setMainDisplayScale(val);
+    localStorage.setItem('mainDisplayScale', String(val));
+  }, []);
+
   const canvasWidth = Math.round(180 + (displayScale / 100) * 200);
   const canvasHeight = Math.round(400 + (displayScale / 100) * 440);
+  const desiredMainWidth = Math.round(260 + (mainDisplayScale / 100) * 260);
+  const desiredMainHeight = Math.round(desiredMainWidth * (820 / 380));
+  const sidebarWidth = sidebarOpen ? 260 : 56;
+  const maxMainCanvasWidth = Math.max(140, viewportSize.width - sidebarWidth - 96);
+  const maxMainCanvasHeight = Math.max(280, viewportSize.height - 112);
+  const mainFitRatio = Math.min(
+    1,
+    maxMainCanvasWidth / desiredMainWidth,
+    maxMainCanvasHeight / desiredMainHeight
+  );
+  const mainCanvasWidth = Math.floor(desiredMainWidth * mainFitRatio);
+  const mainCanvasHeight = Math.floor(desiredMainHeight * mainFitRatio);
 
   const handleMirrorToggle = useCallback(async (serial, isActive) => {
     if (isActive) {
@@ -133,7 +169,6 @@ function App() {
     { id: 'share', label: 'Remote Share', icon: '\u{1F517}' },
     { id: 'received', label: 'Received', icon: '\u{1F4E5}' },
     { id: 'batch', label: 'Batch / File Transfer', icon: '\u{1F4E6}' },
-    { id: 'display', label: 'Display Settings', icon: '\u{1F4BB}' },
   ];
 
   return (
@@ -152,11 +187,22 @@ function App() {
           <span className="status-text">{connected ? 'Connected' : 'Offline'}</span>
           <span className="device-count">{devices.length}</span>
           <button
-            className="theme-toggle"
+            className={`theme-toggle ${theme === 'light' ? 'light-active' : 'dark-active'}`}
             onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            {theme === 'dark' ? '\u2600' : '\u{1F319}'}
+            <span className="theme-toggle-option sun-option" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="3.5" />
+                <path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6.25 6.25l1.42 1.42M16.33 16.33l1.42 1.42M17.75 6.25l-1.42 1.42M7.67 16.33l-1.42 1.42" />
+              </svg>
+            </span>
+            <span className="theme-toggle-option moon-option" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M18.5 15.2A6.6 6.6 0 0 1 8.8 5.5a7 7 0 1 0 9.7 9.7Z" />
+              </svg>
+            </span>
           </button>
         </div>
 
@@ -172,6 +218,50 @@ function App() {
             </button>
           ))}
         </nav>
+
+        {sidebarOpen && (
+          <div className="sidebar-display-panel">
+            <div className="sidebar-panel-title">Display</div>
+            <div className="setting-group compact">
+              <label className="setting-label" htmlFor="sidebar-main-screen-size">Main screen size</label>
+              <div className="slider-row">
+                <span className="slider-label-min">Small</span>
+                <input
+                  id="sidebar-main-screen-size"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={mainDisplayScale}
+                  onChange={e => handleMainScaleChange(Number(e.target.value))}
+                  className="scale-slider"
+                />
+                <span className="slider-label-max">Large</span>
+              </div>
+              <div className="scale-preview">
+                {mainCanvasWidth} x {mainCanvasHeight}
+              </div>
+            </div>
+            <div className="setting-group compact">
+              <label className="setting-label" htmlFor="sidebar-screen-size">Small screen size</label>
+              <div className="slider-row">
+                <span className="slider-label-min">Small</span>
+                <input
+                  id="sidebar-screen-size"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={displayScale}
+                  onChange={e => handleScaleChange(Number(e.target.value))}
+                  className="scale-slider"
+                />
+                <span className="slider-label-max">Large</span>
+              </div>
+              <div className="scale-preview">
+                {canvasWidth} x {canvasHeight}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Laixi-style Groups panel in sidebar */}
         {sidebarOpen && (
@@ -229,8 +319,8 @@ function App() {
                                 onSelectMaster={handleSelectMaster}
                                 onContextMenu={handleContextMenu}
                                 onDoubleClick={handleDoubleClick}
-                                canvasWidth={380}
-                                canvasHeight={820}
+                                canvasWidth={mainCanvasWidth}
+                                canvasHeight={mainCanvasHeight}
                               />
                               {/* Control buttons panel */}
                               <div className="ms-controls">
@@ -282,7 +372,7 @@ function App() {
                     </div>
                   </div>
                 ) : (
-                  <div className="dashboard-grid" style={{ gridTemplateColumns: `repeat(${filteredDevices.length <= 1 ? 1 : filteredDevices.length <= 4 ? 2 : filteredDevices.length <= 9 ? 3 : 4}, 1fr)` }}>
+                  <div className="dashboard-grid" style={{ '--dashboard-device-width': `${canvasWidth}px` }}>
                     {filteredDevices.map(device => (
                       <DeviceCell
                         key={device.serial}
@@ -326,29 +416,6 @@ function App() {
               <ReceivedPanel />
             )}
 
-            {activeTab === 'display' && (
-              <div className="display-settings-panel">
-                <h3>Display Settings</h3>
-                <div className="setting-group">
-                  <label className="setting-label">Screen Mirror Size</label>
-                  <div className="slider-row">
-                    <span className="slider-label-min">Small</span>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={displayScale}
-                      onChange={e => handleScaleChange(Number(e.target.value))}
-                      className="scale-slider"
-                    />
-                    <span className="slider-label-max">Large</span>
-                  </div>
-                  <div className="scale-preview">
-                    {canvasWidth} x {canvasHeight} px
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </main>
       </div>
