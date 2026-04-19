@@ -41,7 +41,7 @@ A desktop application for managing, mirroring, and controlling multiple Android 
 
 ### Install from Release
 
-1. Download `DroidConsole Setup 1.0.0.exe` from Releases
+1. Download `DroidConsole Setup 1.0.1.exe` from Releases
 2. Run the installer
 3. Connect Android devices via USB
 4. Launch DroidConsole - devices auto-mirror immediately

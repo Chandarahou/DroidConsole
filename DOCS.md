@@ -482,8 +482,8 @@ npm run pack           # Build frontend + create unpacked app
 
 ```
 release/
-├── DroidConsole Setup 1.0.0.exe    # NSIS installer
-├── DroidConsole 1.0.0.exe          # Portable executable
+├── DroidConsole Setup 1.0.1.exe    # NSIS installer
+├── DroidConsole 1.0.1.exe          # Portable executable
 └── win-unpacked/                    # Unpacked app directory
     ├── DroidConsole.exe
     └── resources/

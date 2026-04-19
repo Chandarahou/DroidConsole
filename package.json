@@ -1,6 +1,6 @@
 {
   "name": "droid-console",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "DroidConsole - Multi-Device Android Management Desktop App",
   "type": "module",
@@ -8,7 +8,7 @@
   "scripts": {
     "start": "electron .",
     "dev": "cd web-frontend && npx vite build && cd .. && electron .",
-    "build": "cd web-frontend && npx vite build && cd .. && electron-builder --win && node scripts/embed-icon.js",
+    "build": "node scripts/build-win.js",
     "pack": "cd web-frontend && npx vite build && cd .. && electron-builder --dir",
     "web:build": "cd web-frontend && npx vite build",
     "setup": "npm install && cd desktop-host && npm install && cd ../web-frontend && npm install"

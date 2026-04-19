@@ -1,6 +1,6 @@
 {
   "name": "droid-console-host",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DroidConsole Desktop Host",
   "main": "src/index.js",
   "type": "module",
