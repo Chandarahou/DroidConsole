@@ -28,6 +28,8 @@ desktop.ini
 .claude/
 *.swp
 *.swo
+output/
+
 
 # Temp & test files
 test-*.png
