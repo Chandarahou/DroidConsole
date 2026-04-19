@@ -28,7 +28,7 @@ desktop.ini
 .claude/
 *.swp
 *.swo
-output/
+output/pdf
 
 
 # Temp & test files
