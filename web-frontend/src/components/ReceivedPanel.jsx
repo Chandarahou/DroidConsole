@@ -95,8 +95,9 @@ export function ReceivedPanel() {
         return updated;
       });
 
-      // Connect the control socket to the remote host
-      ctrl.connectToRemote(wsBase);
+      // Connect the control socket to the remote host with the share token
+      // so the server can enforce permission scoping.
+      ctrl.connectToRemote(wsBase, token);
 
       if (!silent) setShareCode('');
     } catch (err) {

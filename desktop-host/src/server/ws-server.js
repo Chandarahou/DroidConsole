@@ -22,7 +22,7 @@ export class WsServer {
     const noServerOpts = { noServer: true, perMessageDeflate: false };
 
     this.controlWss = new WebSocketServer(noServerOpts);
-    this.controlWss.on('connection', (ws) => this._handleControlConnection(ws));
+    this.controlWss.on('connection', (ws, req) => this._handleControlConnection(ws, req));
 
     this.videoWss = new WebSocketServer(noServerOpts);
     this.videoWss.on('connection', (ws, req) => this._handleVideoConnection(ws, req));
@@ -79,11 +79,17 @@ export class WsServer {
       }
     });
 
-    // Forward device events to control clients
+    // Forward device events to control clients. Scoped clients (remote
+    // receivers using a share token) only receive events for devices
+    // included in their share.
     const forwardEvent = (event, data) => {
-      const msg = JSON.stringify({ type: event, data });
+      const serial = data?.serial || (typeof data === 'string' ? data : null);
       for (const ws of this.controlClients) {
-        if (ws.readyState === WebSocket.OPEN) ws.send(msg);
+        if (ws.readyState !== WebSocket.OPEN) continue;
+        if (ws.shareToken && serial && !ws.shareSerials.has(serial)) continue;
+        if (ws.shareToken && event === 'groups:updated') continue;
+        if (ws.shareToken && event === 'master:changed') continue;
+        ws.send(JSON.stringify({ type: event, data }));
       }
     };
 
@@ -98,18 +104,44 @@ export class WsServer {
     log.info('WebSocket servers started');
   }
 
-  _handleControlConnection(ws) {
-    log.info('Control client connected');
+  _handleControlConnection(ws, req) {
+    // Parse optional share token — present when a remote receiver connects
+    // via a share code. Local clients (same PC) connect without a token and
+    // have full access as before.
+    const url = new URL(req.url, 'http://localhost');
+    const token = url.searchParams.get('token');
+
+    let share = null;
+    if (token) {
+      share = shareManager.validateToken(token);
+      if (!share) {
+        ws.close(4001, 'Invalid or expired share token');
+        return;
+      }
+      ws.shareToken = token;
+      ws.shareSerials = new Set(share.serials);
+      ws.sharePermissions = share.permissions || {};
+    }
+
+    log.info('Control client connected', { remote: !!token, scopedSerials: share?.serials?.length });
     this.controlClients.add(ws);
 
-    // Send current state
+    // For scoped remote clients, only expose devices included in the share.
+    const allDevices = deviceManager.getAllDevices();
+    const visibleDevices = share
+      ? allDevices.filter(d => ws.shareSerials.has(d.serial))
+      : allDevices;
+    const visibleSessions = share
+      ? sessionManager.getActiveSessions().filter(s => ws.shareSerials.has(s.serial))
+      : sessionManager.getActiveSessions();
+
     ws.send(JSON.stringify({
       type: 'init',
       data: {
-        devices: deviceManager.getAllDevices(),
-        groups: deviceManager.getAllGroups(),
-        sessions: sessionManager.getActiveSessions(),
-        master: deviceManager.masterSerial,
+        devices: visibleDevices,
+        groups: share ? [] : deviceManager.getAllGroups(),
+        sessions: visibleSessions,
+        master: share ? null : deviceManager.masterSerial,
       },
     }));
 
@@ -129,7 +161,26 @@ export class WsServer {
     });
   }
 
+  // Returns true if the message is allowed for this websocket. Local clients
+  // (no shareToken) always pass. Remote clients must target a serial included
+  // in the share AND have the `control` permission for input messages.
+  _authorizeMessage(ws, msg) {
+    if (!ws.shareToken) return true;
+
+    const serial = msg.data?.serial;
+    const isInput = msg.type?.startsWith('input:');
+
+    if (isInput && !ws.sharePermissions?.control) return false;
+    if (serial && !ws.shareSerials.has(serial)) return false;
+    return true;
+  }
+
   async _handleControlMessage(ws, msg) {
+    if (!this._authorizeMessage(ws, msg)) {
+      log.warn('Rejected unauthorized control message', { type: msg.type, serial: msg.data?.serial });
+      return;
+    }
+
     switch (msg.type) {
       case 'input:touch': {
         const { serial, action, x, y, width, height } = msg.data;

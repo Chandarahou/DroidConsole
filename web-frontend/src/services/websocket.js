@@ -10,8 +10,9 @@ export class ControlSocket {
     this.connected = false;
   }
 
-  connectToRemote(wsBase) {
+  connectToRemote(wsBase, token) {
     this._remoteWsBase = wsBase;
+    this._remoteToken = token;
     this.connect();
   }
 
@@ -20,7 +21,10 @@ export class ControlSocket {
     clearTimeout(this.reconnectTimer);
 
     const base = this._remoteWsBase || WS_BASE;
-    this.ws = new WebSocket(`${base}/ws/control`);
+    // Pass share token for remote connections so the server can scope
+    // permissions (without this, remote receivers had unrestricted control).
+    const qs = this._remoteToken ? `?token=${encodeURIComponent(this._remoteToken)}` : '';
+    this.ws = new WebSocket(`${base}/ws/control${qs}`);
 
     this.ws.onopen = () => {
       this.connected = true;
