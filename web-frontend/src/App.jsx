@@ -192,16 +192,19 @@ function App() {
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            <span className="theme-toggle-option sun-option" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="12" r="3.5" />
-                <path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6.25 6.25l1.42 1.42M16.33 16.33l1.42 1.42M17.75 6.25l-1.42 1.42M7.67 16.33l-1.42 1.42" />
-              </svg>
+            <span className="theme-toggle-sky" aria-hidden="true">
+              <span className="theme-cloud cloud-one" />
+              <span className="theme-cloud cloud-two" />
+              <span className="theme-star star-one" />
+              <span className="theme-star star-two" />
+              <span className="theme-star star-three" />
+              <span className="theme-hill hill-one" />
+              <span className="theme-hill hill-two" />
             </span>
-            <span className="theme-toggle-option moon-option" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path d="M18.5 15.2A6.6 6.6 0 0 1 8.8 5.5a7 7 0 1 0 9.7 9.7Z" />
-              </svg>
+            <span className="theme-toggle-orb" aria-hidden="true">
+              <span className="theme-orb-crater crater-one" />
+              <span className="theme-orb-crater crater-two" />
+              <span className="theme-orb-crater crater-three" />
             </span>
           </button>
         </div>
